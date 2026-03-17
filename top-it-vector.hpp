@@ -7,7 +7,7 @@ namespace topit {
   struct Vector {
     ~Vector();
     Vector();
-
+    bool isEmpty() const noexcept;
 
   private:
     T * data_;
@@ -25,5 +25,12 @@ topit::Vector< T >::Vector():
   size_(),
   capacity_()
 {}
+
+
+template< class T >
+bool topit::Vector<T>::isEmpty() const noexcept
+{
+  return false;
+}
 
 #endif
