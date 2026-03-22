@@ -57,4 +57,10 @@ size_t topit::Vector< T >::getSize() const noexcept
   return size_;
 }
 
+template< class T >
+size_t topit::Vector< T >::getCapacity() const noexcept
+{
+  return capacity_;
+}
+
 #endif

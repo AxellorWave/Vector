@@ -15,8 +15,8 @@ bool testGetSize()
 
 bool testGetCapacity()
 {
-  size_t size = 5;
-  return size == 0;
+  topit::Vector< int > v;
+  return v.getCapacity() == 0;
 }
 
 int main()
@@ -24,7 +24,8 @@ int main()
   using test_t = std::pair< const char *, bool(*)() >;
   test_t tests[] = {
     {"Empty vector", testEmptyVector},
-    {"Vector size", testGetSize}
+    {"Vector size", testGetSize},
+    {"Capasity size", testGetCapacity}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
