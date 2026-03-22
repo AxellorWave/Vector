@@ -19,13 +19,19 @@ bool testGetCapacity()
   return v.getCapacity() == 0;
 }
 
+bool testPushBack()
+{
+  return false;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
   test_t tests[] = {
     {"Empty vector", testEmptyVector},
     {"Vector size", testGetSize},
-    {"Capasity size", testGetCapacity}
+    {"Capasity size", testGetCapacity},
+    {"Push back", testPushBack}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
