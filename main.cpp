@@ -9,8 +9,8 @@ bool testEmptyVector()
 
 bool testGetSize()
 {
-  size_t size = 5;
-  return 3 == size;
+  topit::Vector< int > v;
+  return v.getSize() == 0;
 }
 
 int main()
