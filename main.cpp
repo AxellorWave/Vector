@@ -7,11 +7,18 @@ bool testEmptyVector()
   return v.isEmpty();
 }
 
+bool testGetSize()
+{
+  size_t size = 5;
+  return 3 == size;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
   test_t tests[] = {
-    {"Empty vector", testEmptyVector}
+    {"Empty vector", testEmptyVector},
+    {"Vector size", testGetSize}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
