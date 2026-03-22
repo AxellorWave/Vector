@@ -12,10 +12,13 @@ namespace topit {
     Vector & operator=(const Vector &);
     Vector & operator=(Vector &&);
 
+    T & operator[](size_t i) const noexcept;
+
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
 
+    void extend(size_t new_capacity);
     void pushBack(const T & v);
     void popBack();
     void insert(size_t i, const T & v);
@@ -26,10 +29,6 @@ namespace topit {
     size_t size_, capacity_;
   };
 }
-
-template< class T >
-void topit::Vector< T >::pushBack(const T & v)
-{}
 
 template< class T >
 topit::Vector< T >::~Vector()
@@ -44,6 +43,11 @@ topit::Vector< T >::Vector():
   capacity_(0)
 {}
 
+template< class T >
+T & topit::Vector< T >::operator[](size_t i) const noexcept
+{
+  return data_[i];
+}
 
 template< class T >
 bool topit::Vector<T>::isEmpty() const noexcept
@@ -61,6 +65,31 @@ template< class T >
 size_t topit::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
+}
+
+template< class T >
+void topit::Vector< T >::extend(size_t new_capacity)
+{
+  T * new_data = new T[new_capacity];
+  for (size_t i = 0; i < size_; ++i) {
+    new_data[i] = data_[i];
+  }
+  delete[] data_;
+  data_ = new_data;
+  capacity_ = new_capacity;
+}
+
+template< class T >
+void topit::Vector< T >::pushBack(const T & v)
+{
+  if (isEmpty()) {
+    extend(2);
+  }
+  if (size_ == capacity_) {
+    extend(capacity_ * 2);
+  }
+  data_[size_] = v;
+  ++size_;
 }
 
 #endif

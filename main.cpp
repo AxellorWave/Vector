@@ -21,7 +21,9 @@ bool testGetCapacity()
 
 bool testPushBack()
 {
-  return false;
+  topit::Vector< int > v;
+  v.pushBack(1);
+  return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 2;
 }
 
 int main()
