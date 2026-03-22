@@ -26,6 +26,11 @@ bool testPushBack()
   return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 2;
 }
 
+bool testPopBack()
+{
+  return false;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
