@@ -13,6 +13,12 @@ bool testGetSize()
   return v.getSize() == 0;
 }
 
+bool testGetCapacity()
+{
+  size_t size = 5;
+  return size == 0;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
