@@ -28,7 +28,10 @@ bool testPushBack()
 
 bool testPopBack()
 {
-  return false;
+  topit::Vector< int > v;
+  v.pushBack(1);
+  v.popBack();
+  return v.getSize() == 0 && v.getCapacity() == 2;
 }
 
 int main()
@@ -38,7 +41,8 @@ int main()
     {"Empty vector", testEmptyVector},
     {"Vector size", testGetSize},
     {"Capasity size", testGetCapacity},
-    {"Push back", testPushBack}
+    {"Push back", testPushBack},
+    {"Pop back", testPopBack}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

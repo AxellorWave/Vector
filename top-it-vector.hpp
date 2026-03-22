@@ -91,5 +91,10 @@ void topit::Vector< T >::pushBack(const T & v)
   data_[size_] = v;
   ++size_;
 }
+template< class T >
+void topit::Vector< T >::popBack()
+{
+  --size_;
+}
 
 #endif
