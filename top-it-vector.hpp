@@ -55,14 +55,15 @@ const T & topit::Vector< T >::operator[](size_t id) const noexcept
 template< class T >
 T & topit::Vector< T >::operator[](size_t id) noexcept
 {
-  return data_[id];
+  const Vector * cthis = this;
+  return const_cast< T & >((*cthis)[id]);
 }
 
 template< class T >
 const T & topit::Vector< T >::at(size_t id) const
 {
   if (id < getSize()) {
-    return data_[id];
+    return (*this)[id];
   }
   throw std::out_of_range("Bad index");
 }
@@ -70,7 +71,8 @@ const T & topit::Vector< T >::at(size_t id) const
 template< class T >
 T & topit::Vector< T >::at(size_t id)
 {
-  return const_cast< T& >(static_cast< const Vector< T > * >(this)->at(pos));
+  const Vector< T > * cthis = this ;
+  return  const_cast< T & >(cthis->at(id));
 }
 
 template< class T >
