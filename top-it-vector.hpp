@@ -70,10 +70,7 @@ const T & topit::Vector< T >::at(size_t id) const
 template< class T >
 T & topit::Vector< T >::at(size_t id)
 {
-  if (id < getSize()) {
-    return data_[id];
-  }
-  throw std::out_of_range("Bad index");
+  return const_cast< T& >(static_cast< const Vector< T > * >(this)->at(pos));
 }
 
 template< class T >
