@@ -11,6 +11,7 @@ namespace topit {
     Vector(Vector &&);
     Vector & operator=(const Vector &);
     Vector & operator=(Vector &&);
+    Vector(size_t size, const T& init);
 
     T & operator[](size_t id) noexcept;
     const T & operator[](size_t id) const noexcept;
@@ -28,6 +29,7 @@ namespace topit {
     void erase(size_t i);
 
   private:
+    explicit Vector(size_t c);
     T * data_;
     size_t size_, capacity_;
   };
@@ -128,18 +130,26 @@ void topit::Vector< T >::popBack()
 
 template< class T >
 topit::Vector<T>::Vector(const Vector& other):
-  data_(other.size_ ? new T[other.size_] : nullptr),
-  size_(0),
-  capacity_(other.size_)
+  Vector(other.size_)
 {
   for (size_t i = 0; i < other.size_; ++i) {
-    try {
-      data_[i] = other.data_[i];
-      size_++;
-    } catch (...) {
-     delete[] data_;
-      throw;
-    }
+    data_[i] = other.data_[i];
+  }
+}
+
+template< class T >
+topit::Vector< T >::Vector(size_t c):
+  data_(c ? new T[c] : nullptr),
+  size_(c),
+  capacity_(c)
+{}
+
+template< class T >
+topit::Vector<T>::Vector(size_t size, const T& init):
+ Vector(size)
+{
+  for (size_t i = 0; i < size; ++i) {
+    data_[i] = init;
   }
 }
 
