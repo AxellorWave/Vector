@@ -34,6 +34,31 @@ bool testPopBack()
   return v.getSize() == 0 && v.getCapacity() == 2;
 }
 
+bool testElementInBoundAccess()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  try {
+    int & val = v.at(0);
+    return val == 1;
+  } catch (...) {
+    return false;
+  }
+}
+
+bool testElementOutOfBoundAccess()
+{
+  topit::Vector< int > v;
+  try {
+    v.at(0);
+    return false;
+  } catch (const std::out_of_range & e) {
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -42,7 +67,9 @@ int main()
     {"Vector size", testGetSize},
     {"Capasity size", testGetCapacity},
     {"Push back", testPushBack},
-    {"Pop back", testPopBack}
+    {"Pop back", testPopBack},
+    {"Element in bound acess", testElementInBoundAccess},
+    {"Element out of bound access", testElementOutOfBoundAccess}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
@@ -54,5 +81,6 @@ int main()
   }
   std::cout << "RESULT: " << pass << "\n";
 }
+
 // подсчет пройденных и непройденных.
 // Выводить только не прошедшие тесты

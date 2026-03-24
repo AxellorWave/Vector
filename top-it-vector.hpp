@@ -12,7 +12,10 @@ namespace topit {
     Vector & operator=(const Vector &);
     Vector & operator=(Vector &&);
 
-    T & operator[](size_t i) const noexcept;
+    T & operator[](size_t id) noexcept;
+    const T & operator[](size_t id) const noexcept;
+    T & at(size_t id);
+    const T & at(size_t id) const;
 
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
@@ -44,9 +47,33 @@ topit::Vector< T >::Vector():
 {}
 
 template< class T >
-T & topit::Vector< T >::operator[](size_t i) const noexcept
+const T & topit::Vector< T >::operator[](size_t id) const noexcept
 {
-  return data_[i];
+  return data_[id];
+}
+
+template< class T >
+T & topit::Vector< T >::operator[](size_t id) noexcept
+{
+  return data_[id];
+}
+
+template< class T >
+const T & topit::Vector< T >::at(size_t id) const
+{
+  if (id < getSize()) {
+    return data_[id];
+  }
+  throw std::range_error("Bad index");
+}
+
+template< class T >
+T & topit::Vector< T >::at(size_t id)
+{
+  if (id < getSize()) {
+    return data_[id];
+  }
+  throw std::range_error("Bad index");
 }
 
 template< class T >
