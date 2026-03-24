@@ -133,8 +133,6 @@ topit::Vector<T>::Vector(const Vector& other):
   capacity_(other.size_)
 {
   for (size_t i = 0; i < other.size_; ++i) {
-    data_[i] = other.data_[i];
-    size_++;
     try {
       data_[i] = other.data_[i];
       size_++;
