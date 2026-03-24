@@ -85,6 +85,13 @@ bool testElementOutOfBoundConstAccess()
   }
 }
 
+bool testCopyConstractor()
+{
+  topit::Vector< int > v;
+  topit::Vector< int > cv = v;
+  return v == cv;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -97,7 +104,8 @@ int main()
     {"Element in bound acess", testElementInBoundAccess},
     {"Element out of bound access", testElementOutOfBoundAccess},
     {"Element in bound const acess", testElementInBoundConstAccess},
-    {"Element out of bound const access", testElementOutOfBoundConstAccess}
+    {"Element out of bound const access", testElementOutOfBoundConstAccess},
+    {"Copy Constractor", testCopyConstractor}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

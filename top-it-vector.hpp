@@ -128,9 +128,9 @@ void topit::Vector< T >::popBack()
 
 template< class T >
 topit::Vector<T>::Vector(const Vector& other):
-  data_(new T[other.cap_]),
+  data_(new T[other.capacity_]),
   size_(0),
-  capacity_(other.cap_)
+  capacity_(other.capacity_)
 {
   for (size_t i = 0; i < other.size_; ++i) {
     data_[i] = other.data_[i];
