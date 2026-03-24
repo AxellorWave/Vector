@@ -135,6 +135,13 @@ topit::Vector<T>::Vector(const Vector& other):
   for (size_t i = 0; i < other.size_; ++i) {
     data_[i] = other.data_[i];
     size_++;
+    try {
+      data_[i] = other.data_[i];
+      size_++;
+    } catch (...) {
+     delete[] data_;
+      throw;
+    }
   }
 }
 
