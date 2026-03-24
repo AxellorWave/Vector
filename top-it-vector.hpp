@@ -173,12 +173,26 @@ void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
 }
 
 template< class T >
-topit::Vector<T>& topit::Vector<T>::operator=(const Vector& rhs)
+topit::Vector<T>& topit::Vector<T>::operator=(const Vector & rhs)
 {
-  if (this == &rhs) {
-    return *this;
-  }
   Vector< T > cpy(rhs);
+  swap(cpy);
+  return *this;
+}
+
+template< class T >
+topit::Vector< T >::Vector(Vector && o):
+  data_(o.data_),
+  size_(o.size),
+  capacity_(o.capacity)
+{
+  o.data_ = nullptr;
+}
+
+template< class T >
+topit::Vector< T > & topit::Vector< T >::operator=(Vector && o)
+{
+  Vector< T > cpy(std::move(o));
   swap(cpy);
   return *this;
 }
