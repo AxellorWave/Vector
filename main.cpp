@@ -59,6 +59,32 @@ bool testElementOutOfBoundAccess()
   }
 }
 
+bool testElementInBoundConstAccess()
+{
+  topit::Vector< int > v;
+  v.pushBack(1);
+  const topit::Vector< int > & cv = v;
+  try {
+    const int & val = cv.at(0);
+    return val == 1;
+  } catch (...) {
+    return false;
+  }
+}
+
+bool testElementOutOfBoundConstAccess()
+{
+  const topit::Vector< int > v;
+  try {
+    v.at(0);
+    return false;
+  } catch (const std::out_of_range & e) {
+    return true;
+  } catch (...) {
+    return false;
+  }
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;

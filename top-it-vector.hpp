@@ -64,7 +64,7 @@ const T & topit::Vector< T >::at(size_t id) const
   if (id < getSize()) {
     return data_[id];
   }
-  throw std::range_error("Bad index");
+  throw std::out_of_range("Bad index");
 }
 
 template< class T >
@@ -73,7 +73,7 @@ T & topit::Vector< T >::at(size_t id)
   if (id < getSize()) {
     return data_[id];
   }
-  throw std::range_error("Bad index");
+  throw std::out_of_range("Bad index");
 }
 
 template< class T >
