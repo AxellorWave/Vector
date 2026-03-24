@@ -95,7 +95,9 @@ int main()
     {"Push back", testPushBack},
     {"Pop back", testPopBack},
     {"Element in bound acess", testElementInBoundAccess},
-    {"Element out of bound access", testElementOutOfBoundAccess}
+    {"Element out of bound access", testElementOutOfBoundAccess},
+    {"Element in bound const acess", testElementInBoundConstAccess},
+    {"Element out of bound const access", testElementOutOfBoundConstAccess}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
