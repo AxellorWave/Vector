@@ -29,7 +29,7 @@ namespace topit {
     void insert(size_t id, const T & v);
     void insert(size_t id, const Vector< T > & v, size_t start, size_t end);
     void erase(size_t id);
-    void erase(size_t id, size_t start, size_t end);
+    void erase(size_t start, size_t end);
 
   private:
     explicit Vector(size_t c);
@@ -230,10 +230,10 @@ void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, 
     throw std::logic_error("insert: start > end");
   }
   if (end >= v.getSize()) {
-    throw std::logic_error("insert: end out of range");
+    throw std::out_of_range("insert: end out of range");
   }
   if (start >= v.getSize()) {
-    throw std::logic_error("insert: start out of range");
+    throw std::out_of_range("insert: start out of range");
   }
   size_t new_capacity = getSize() + end - start;
   size_t new_size = new_capacity;
@@ -280,24 +280,24 @@ void topit::Vector< T >::erase(size_t id)
 }
 
 template< class T >
-void topit::Vector< T >::erase(size_t id, size_t start, size_t end)
+void topit::Vector< T >::erase(size_t start, size_t end)
 {
   if (start > end) {
     throw std::logic_error("insert: start > end");
   }
   if (end >= getSize()) {
-    throw std::logic_error("insert: end out of range");
+    throw std::out_of_range("insert: end out of range");
   }
   if (start >= getSize()) {
-    throw std::logic_error("insert: start out of range");
+    throw std::out_of_range("insert: start out of range");
   }
 
   T * new_data = new T[getSize() - (end - start)];
   try {
-    for (size_t i = 0; i < id; ++i) {
+    for (size_t i = 0; i < start; ++i) {
       new_data[i] = data_[i];
     }
-    for (size_t i = id; i < getSize() - (end - start); ++i) {
+    for (size_t i = start; i < getSize() - (end - start); ++i) {
       new_data[i] = data_[i + (end - start)];
     }
   } catch (...) {

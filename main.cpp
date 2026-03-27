@@ -143,6 +143,27 @@ bool testInsertVector()
   return v == vr;
 }
 
+bool testEraseValue()
+{
+  topit::Vector< int > v(3, 0); 
+  v.erase(1);
+  return v.getSize() == 2 && v.at(1) == 0;
+}
+
+bool testEraseRange()
+{
+  topit::Vector< int > v(3, 0);
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);  
+  v.erase(1, 4);
+  topit::Vector< int > vr;
+  vr.pushBack(0);
+  vr.pushBack(2);
+  vr.pushBack(3);
+  return v.getSize() == 3 && v == vr;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -161,8 +182,10 @@ int main()
     {"Move Constractor", testMoveConstractor},
     {"Copy Operator", testCopyOperator},
     {"Move Operator", testMoveOperator},
-    {"testInsertValue", testInsertValue},
-    {"testInsertVector", testInsertVector}
+    {"Insert Value", testInsertValue},
+    {"Insert Vector", testInsertVector},
+    {"Erase Value", testEraseValue},
+    {"Erase Range", testEraseRange}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
