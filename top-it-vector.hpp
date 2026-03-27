@@ -226,6 +226,7 @@ void topit::Vector< T >::insert(size_t id, const T & v)
     throw;
   }
   delete[] data_;
+  data_ = new_data;
   size_ = new_size;
   capacity_ = new_capacity;
 }
