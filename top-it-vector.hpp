@@ -28,7 +28,8 @@ namespace topit {
     void popBack();
     void insert(size_t id, const T & v);
     void insert(size_t id, const Vector< T > & v, size_t start, size_t end);
-    void erase(size_t i);
+    void erase(size_t id);
+    void erase(size_t id, size_t start, size_t end);
 
   private:
     explicit Vector(size_t c);
@@ -201,16 +202,8 @@ topit::Vector< T > & topit::Vector< T >::operator=(Vector && o)
 template < class T >
 void topit::Vector< T >::insert(size_t id, const T & v)
 {
-  size_t new_capacity = getCapacity();
-  size_t new_size = getSize() + 1;
-  if (getSize() == getCapacity()) {
-    if (isEmpty()) {
-      new_capacity = 2;
-    } else {
-      new_capacity *= 2;
-    }
-  }
-
+  size_t new_capacity = getSize() + 1;
+  size_t new_size = new_capacity;
   T * new_data = new T[new_capacity];
   try {
     for (size_t i = 0; i < id; ++i) {
@@ -242,15 +235,8 @@ void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, 
   if (start >= v.getSize()) {
     throw std::logic_error("insert: start out of range");
   }
-  size_t new_capacity = getCapacity();
-  size_t new_size = getSize() + end - start;
-  if (isEmpty()) {
-    new_capacity = end - start;
-  } 
-  if (getSize() > getCapacity()) {
-    new_capacity += (end - start);
-  }
-
+  size_t new_capacity = getSize() + end - start;
+  size_t new_size = new_capacity;
   T * new_data = new T[new_capacity];
   try {
     for (size_t i = 0; i < id; ++i) {
@@ -272,5 +258,56 @@ void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, 
   capacity_ = new_capacity;
 }
 
+template< class T >
+void topit::Vector< T >::erase(size_t id)
+{
+  T * new_data = new T[getSize() - 1];
+  try {
+    for (size_t i = 0; i < id; ++i) {
+      new_data[i] = data_[i];
+    }
+    for (size_t i = id; i < getSize() - 1; ++i) {
+      new_data[i] = data_[i+1];
+    }
+  } catch (...) {
+    delete[] new_data;
+    throw;
+  }
+  delete[] data_;
+  data_ = new_data;
+  --size_;
+  capacity_ = size_;
+}
+
+template< class T >
+void topit::Vector< T >::erase(size_t id, size_t start, size_t end)
+{
+  if (start > end) {
+    throw std::logic_error("insert: start > end");
+  }
+  if (end >= getSize()) {
+    throw std::logic_error("insert: end out of range");
+  }
+  if (start >= getSize()) {
+    throw std::logic_error("insert: start out of range");
+  }
+
+  T * new_data = new T[getSize() - (end - start)];
+  try {
+    for (size_t i = 0; i < id; ++i) {
+      new_data[i] = data_[i];
+    }
+    for (size_t i = id; i < getSize() - (end - start); ++i) {
+      new_data[i] = data_[i + (end - start)];
+    }
+  } catch (...) {
+    delete[] new_data;
+    throw;
+  }
+  delete[] data_;
+  data_ = new_data;
+  size_ -= (end - start);
+  capacity_ = size_;
+}
 
 #endif

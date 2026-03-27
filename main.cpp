@@ -135,7 +135,7 @@ bool testInsertVector()
   topit::Vector< int > v(2, 1);
   topit::Vector< int > vi(3, 0);
   v.insert(1, vi, 0, 2);
-  topit::Vector< int > vr = v;
+  topit::Vector< int > vr;
   vr.pushBack(1);
   vr.pushBack(0);
   vr.pushBack(0);
@@ -160,7 +160,9 @@ int main()
     {"Copy None Empty Vector", testCopyNoneEmptyVector},
     {"Move Constractor", testMoveConstractor},
     {"Copy Operator", testCopyOperator},
-    {"Move Operator", testMoveOperator}
+    {"Move Operator", testMoveOperator},
+    {"testInsertValue", testInsertValue},
+    {"testInsertVector", testInsertVector}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
