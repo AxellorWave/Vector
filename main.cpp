@@ -123,6 +123,26 @@ bool testMoveOperator()
   return v.getSize() == 3 && v.at(0) == 2;
 }
 
+bool testInsertValue()
+{
+  topit::Vector< int > v(2, 1);
+  v.insert(1, 0);
+  return v.getSize() == 3 && v.at(1) == 0 && v.at(2) == 1;
+}
+
+bool testInsertVector()
+{
+  topit::Vector< int > v(2, 1);
+  topit::Vector< int > vi(3, 0);
+  v.insert(1, vi, 0, 2);
+  topit::Vector< int > vr = v;
+  vr.pushBack(1);
+  vr.pushBack(0);
+  vr.pushBack(0);
+  vr.pushBack(1);
+  return v == vr;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
