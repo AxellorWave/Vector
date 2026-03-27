@@ -26,7 +26,7 @@ namespace topit {
     void extend(size_t new_capacity);
     void pushBack(const T & v);
     void popBack();
-    void insert(size_t i, const T & v);
+    void insert(size_t id, const T & v);
     void erase(size_t i);
 
   private:
@@ -196,5 +196,39 @@ topit::Vector< T > & topit::Vector< T >::operator=(Vector && o)
   swap(cpy);
   return *this;
 }
+
+template < class T >
+void topit::Vector< T >::insert(size_t id, const T & v)
+{
+  size_t new_capacity = getCapacity();
+  size_t new_size = getSize();
+  if (getSize() == getCapacity()) {
+    if (isEmpty()) {
+      new_capacity = 2;
+      new_size = 1;
+    } else {
+      new_capacity *= 2;
+      ++new_size;
+    }
+  }
+
+  T * new_data = new T[new_capacity];
+  try {
+    for (size_t i = 0; i < id; ++i) {
+      new_data[i] = data_[i];
+    }
+    new_data[id] = v;
+    for (size_t i = id + 1; i < new_size; ++i) {
+      new_data[i] = data_[i-1];
+    }
+  } catch (...) {
+    delete[] new_data;
+    throw;
+  }
+  delete[] data_;
+  size_ = new_size;
+  capacity_ = new_capacity;
+}
+
 
 #endif
