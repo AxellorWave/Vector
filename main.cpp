@@ -100,6 +100,29 @@ bool testCopyNoneEmptyVector()
   return v == cv;
 }
 
+bool testMoveConstractor()
+{
+  topit::Vector< int > v(2, 1);
+  topit::Vector< int > cv = std::move(v);
+  return cv.getSize() == 2;
+}
+
+bool testCopyOperator()
+{
+  topit::Vector< int > v(2, 1);
+  topit::Vector< int > v2(3, 2);
+  v = v2;
+  return v.getSize() == 3 && v.at(0) == 2;
+}
+
+bool testMoveOperator()
+{
+  topit::Vector< int > v(2, 1);
+  topit::Vector< int > v2(3, 2);
+  v = std::move(v2);
+  return v.getSize() == 3 && v.at(0) == 2;
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -114,7 +137,10 @@ int main()
     {"Element in bound const acess", testElementInBoundConstAccess},
     {"Element out of bound const access", testElementOutOfBoundConstAccess},
     {"Copy Empty Vector", testCopyConstractor},
-    {"Copy None Empty Vector", testCopyNoneEmptyVector}
+    {"Copy None Empty Vector", testCopyNoneEmptyVector},
+    {"Move Constractor", testMoveConstractor},
+    {"Copy Operator", testCopyOperator},
+    {"Move Operator", testMoveOperator}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

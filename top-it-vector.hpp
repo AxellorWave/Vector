@@ -11,14 +11,14 @@ namespace topit {
     Vector(Vector &&);
     Vector & operator=(const Vector &);
     Vector & operator=(Vector &&);
-    Vector(size_t size, const T& init);
+    Vector(size_t size, const T & init);
 
     T & operator[](size_t id) noexcept;
     const T & operator[](size_t id) const noexcept;
     T & at(size_t id);
     const T & at(size_t id) const;
 
-    void swap(Vector< T >& rhs) noexcept;
+    void swap(Vector< T > & rhs) noexcept;
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
@@ -130,7 +130,7 @@ void topit::Vector< T >::popBack()
 }
 
 template< class T >
-topit::Vector<T>::Vector(const Vector& other):
+topit::Vector<T>::Vector(const Vector & other):
   Vector(other.size_)
 {
   for (size_t i = 0; i < other.size_; ++i) {
@@ -146,7 +146,7 @@ topit::Vector< T >::Vector(size_t c):
 {}
 
 template< class T >
-topit::Vector<T>::Vector(size_t size, const T& init):
+topit::Vector<T>::Vector(size_t size, const T & init):
  Vector(size)
 {
   for (size_t i = 0; i < size; ++i) {
@@ -155,7 +155,7 @@ topit::Vector<T>::Vector(size_t size, const T& init):
 }
 
 template< class T >
-bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs)
+bool topit::operator==(const Vector<T> & lhs, const Vector<T> & rhs)
 {
   bool res = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; i < lhs.getSize(); ++i) {
@@ -165,15 +165,15 @@ bool topit::operator==(const Vector<T>& lhs, const Vector<T>& rhs)
 }
 
 template< class T >
-void topit::Vector< T >::swap(Vector< T >& rhs) noexcept
+void topit::Vector< T >::swap(Vector< T > & rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
-  std::swap(capacity_, rhs.cap_);
+  std::swap(capacity_, rhs.capacity_);
 }
 
 template< class T >
-topit::Vector<T>& topit::Vector<T>::operator=(const Vector & rhs)
+topit::Vector<T> & topit::Vector<T>::operator=(const Vector & rhs)
 {
   Vector< T > cpy(rhs);
   swap(cpy);
@@ -183,8 +183,8 @@ topit::Vector<T>& topit::Vector<T>::operator=(const Vector & rhs)
 template< class T >
 topit::Vector< T >::Vector(Vector && o):
   data_(o.data_),
-  size_(o.size),
-  capacity_(o.capacity)
+  size_(o.size_),
+  capacity_(o.capacity_)
 {
   o.data_ = nullptr;
 }
