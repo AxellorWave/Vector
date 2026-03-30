@@ -229,7 +229,7 @@ void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, 
   if (start > end) {
     throw std::logic_error("insert: start > end");
   }
-  if (end >= v.getSize()) {
+  if (end > v.getSize()) {
     throw std::out_of_range("insert: end out of range");
   }
   if (start >= v.getSize()) {
@@ -285,7 +285,7 @@ void topit::Vector< T >::erase(size_t start, size_t end)
   if (start > end) {
     throw std::logic_error("insert: start > end");
   }
-  if (end >= getSize()) {
+  if (end > getSize()) {
     throw std::out_of_range("insert: end out of range");
   }
   if (start >= getSize()) {

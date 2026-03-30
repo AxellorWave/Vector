@@ -143,6 +143,18 @@ bool testInsertVector()
   return v == vr;
 }
 
+bool testInsertSelfVector()
+{
+  topit::Vector< int > v(2, 1);
+  v.insert(1, v, 0, 2);
+  topit::Vector< int > vr;
+  vr.pushBack(1);
+  vr.pushBack(1);
+  vr.pushBack(1);
+  vr.pushBack(1);
+  return v == vr;
+}
+
 bool testEraseValue()
 {
   topit::Vector< int > v(3, 0); 
@@ -185,7 +197,8 @@ int main()
     {"Insert Value", testInsertValue},
     {"Insert Vector", testInsertVector},
     {"Erase Value", testEraseValue},
-    {"Erase Range", testEraseRange}
+    {"Erase Range", testEraseRange},
+    {"Insert Self Vector", testInsertSelfVector}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
