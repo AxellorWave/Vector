@@ -52,7 +52,9 @@ namespace zharov {
     VIter< T > insert(VIter< T > pos, VCIter< T > start, VCIter< T > end);
     void erase(size_t id);
     void erase(size_t start, size_t end);
-    void erase(VIter< T > start , VIter< T > finish)
+    void erase(VIter< T > start , VIter< T > finish);
+    void erase(VIter< T > pos);
+
 
   private:
     void unsafePushBack();
@@ -365,24 +367,24 @@ void zharov::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start,
 }
 
 template< class T >
+void zharov::Vector< T >::erase(VIter< T > pos)
+{
+  Vector< T > cpy(size_ - 1);
+  VIter< T > itcp = cpy.begin();
+
+  for (auto it = begin(); it < pos; ++it, ++itcp) {
+    *itcp = *it;
+  }
+  for (auto it = pos; it < end(); ++it, ++itcp) {
+    *itcp = *it;
+  }
+  swap(cpy);
+}
+
+template< class T >
 void zharov::Vector< T >::erase(size_t id)
 {
-  T * new_data = new T[getSize() - 1];
-  try {
-    for (size_t i = 0; i < id; ++i) {
-      new_data[i] = data_[i];
-    }
-    for (size_t i = id; i < getSize() - 1; ++i) {
-      new_data[i] = data_[i+1];
-    }
-  } catch (...) {
-    delete[] new_data;
-    throw;
-  }
-  delete[] data_;
-  data_ = new_data;
-  --size_;
-  capacity_ = size_;
+  erase(begin() + id);
 }
 
 template< class T >
@@ -401,13 +403,19 @@ void zharov::Vector< T >::erase(VIter< T > start , VIter< T > finish)
   Vector< T > cpy(size_ - len);
   VIter< T > itcp = cpy.begin();
   for (auto it = begin(); it < start; ++itcp, ++it) {
-    *cpy = *it;
+    *itcp = *it;
   }
-  for (auto it = finish; it < end(), ++itcp, ++it) {
-    *cpy = *it;
+  for (auto it = finish; it < end(); ++itcp, ++it) {
+    *itcp = *it;
   }
   
   swap(cpy);
+}
+
+template< class T >
+void zharov::Vector< T >::erase(size_t start , size_t end)
+{
+  erase(begin() + start, begin() + end);
 }
 
 #endif
