@@ -2,6 +2,8 @@
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
 #include <initializer_list>
+#include <viter.hpp>
+#include <vciter.hpp>
 
 namespace zharov {
   template <class T >
@@ -26,6 +28,13 @@ namespace zharov {
     size_t getCapacity() const noexcept;
     void reserve(size_t);
     void shrinkToFit();
+
+    VIter< T > begin();
+    VCIter< T > begin() const;
+    VCIter< T > cbegin() const;
+    VIter< T > end();
+    VCIter< T > end() const;
+    VCIter< T > cend() const;
 
     void extend(size_t new_capacity);
     void pushBack(const T & v);
@@ -70,6 +79,42 @@ zharov::Vector< T >::Vector(std::initializer_list< T > il):
   for (auto it = il.begin(); it != il.end(); ++it) {
     data_[i++] = *it;
   }
+}
+
+template< class T >
+zharov::VIter< T > zharov::Vector< T >::begin()
+{
+  return VIter< T >(data_);
+}
+
+template< class T >
+zharov::VCIter< T > zharov::Vector< T >::begin() const
+{
+  return VCIter< T >(data_);
+}
+
+template< class T >
+zharov::VCIter< T > zharov::Vector< T >::cbegin() const
+{
+  return VCIter< T >(data_);
+}
+
+template< class T >
+zharov::VIter< T > zharov::Vector< T >::end()
+{
+  return VIter< T >(data_ + size_);
+}
+
+template< class T >
+zharov::VCIter< T > zharov::Vector< T >::end() const
+{
+  return VCIter< T >(data_ + size_);
+}
+
+template< class T >
+zharov::VCIter< T > zharov::Vector< T >::cend() const
+{
+  return VCIter< T >(data_ + size_);
 }
 
 template< class T >
