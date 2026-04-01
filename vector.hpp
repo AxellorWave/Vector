@@ -1,9 +1,10 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
+#include <utility>
 #include <cstddef>
 #include <initializer_list>
-#include <viter.hpp>
-#include <vciter.hpp>
+#include "viter.hpp"
+#include "vciter.hpp"
 
 namespace zharov {
   template <class T >
@@ -42,10 +43,16 @@ namespace zharov {
     template <class IT>
     void pushBackRange(IT b, size_t c);
     void popBack();
+    template< class U >
+    VIter< T > generalInsert(VIter< T > pos, U && v);
     void insert(size_t id, const T & v);
     void insert(size_t id, const Vector< T > & v, size_t start, size_t end);
+    VIter< T > insert(VIter< T > pos, const T & v);
+    VIter< T > insert(VIter< T > pos, T && v);
+    VIter< T > insert(VIter< T > pos, VCIter< T > start, VCIter< T > end);
     void erase(size_t id);
     void erase(size_t start, size_t end);
+    void erase(VIter< T > start , VIter< T > finish)
 
   private:
     void unsafePushBack();
@@ -189,25 +196,25 @@ void zharov::Vector< T >::pushBack(const T & v)
   ++size_;
 }
 
-template< class T >
-template< class IT >
-void zharov::Vector< T >::pushBackRange(IT b, size_t c)
-{
-  size_t c = std::distance(b, e);
+// template< class T >
+// template< class IT >
+// void zharov::Vector< T >::pushBackRange(IT b, size_t c)
+// {
+//   size_t c = std::distance(b, e);
 
-}
+//}
 
-template< class T >
-void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
-{
+// template< class T >
+// void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
+// {
 
-}
+//}
 
-template< class T >
-void zharov::Vector< T >::unsafePushBack()
-{
-  assert(size_ < capacity_);
-}
+// template< class T >
+// void zharov::Vector< T >::unsafePushBack()
+// {
+//   assert(size_ < capacity_);
+// }
 
 template< class T >
 void zharov::Vector< T >::popBack()
@@ -283,63 +290,78 @@ zharov::Vector< T > & zharov::Vector< T >::operator=(Vector && o)
   return *this;
 }
 
+template< class T >
+template< class U >
+zharov::VIter< T > zharov::Vector< T >::generalInsert(VIter< T > pos, U && v)
+{
+  if (pos == end()) {
+    pushBack(std::forward< U >(v));
+    return VIter< T >(pos + size_ - 1);
+  }
+  std::ptrdiff_t ind = pos - begin();
+  Vector< T > cpy(size_ + 1);
+  VIter< T > cpit = cpy.begin();
+  for (VIter< T > it = begin(); it < pos; ++it, ++cpit) {
+    *cpit = *it;
+  }
+  *cpit = std::forward< U >(v);
+  ++cpit;
+  for (VIter< T > it = pos; it < end(); ++it, ++cpit) {
+    *cpit = *it;
+  }
+  swap(cpy);
+  return VIter< T >(data_ + ind);
+} 
+
 template < class T >
 void zharov::Vector< T >::insert(size_t id, const T & v)
 {
-  size_t new_capacity = getSize() + 1;
-  size_t new_size = new_capacity;
-  T * new_data = new T[new_capacity];
-  try {
-    for (size_t i = 0; i < id; ++i) {
-      new_data[i] = data_[i];
-    }
-    new_data[id] = v;
-    for (size_t i = id + 1; i < new_size; ++i) {
-      new_data[i] = data_[i-1];
-    }
-  } catch (...) {
-    delete[] new_data;
-    throw;
+  generalInsert(begin() + id, v);
+}
+
+template< class T >
+zharov::VIter< T > zharov::Vector< T >::insert(VIter< T > pos, VCIter< T > start, VCIter< T > finish)
+{
+  if (start > finish) {
+    throw std::logic_error("insert: start > end");
   }
-  delete[] data_;
-  data_ = new_data;
-  size_ = new_size;
-  capacity_ = new_capacity;
+  if (pos > end()) {
+    throw std::out_of_range("insert: pos out of range");
+  }
+  std::ptrdiff_t ind = pos - begin();
+  std::ptrdiff_t len = finish - start;
+  Vector< T > cpy(size_ + len);
+  VIter< T > cpit = cpy.begin();
+  for (VIter< T > it = begin(); it < pos; ++it, ++cpit) {
+    *cpit = *it;
+  }
+  for (;start < finish; ++start, ++cpit) {
+    *cpit = *start;
+  }
+  for (VIter< T > it = pos; it < end(); ++it, ++cpit) {
+    *cpit = *it;
+  }
+  swap(cpy);
+  
+  return VIter< T >(data_ + ind);
+}
+
+template< class T >
+zharov::VIter< T > zharov::Vector< T >::insert(VIter< T > pos, const T & v)
+{
+  return generalInsert(pos, v);
+}
+
+template< class T >
+zharov::VIter< T > zharov::Vector< T >::insert(VIter< T > pos, T && v)
+{
+  return generalInsert(pos, v);
 }
 
 template< class T >
 void zharov::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, size_t end)
 {
-  if (start > end) {
-    throw std::logic_error("insert: start > end");
-  }
-  if (end > v.getSize()) {
-    throw std::out_of_range("insert: end out of range");
-  }
-  if (start >= v.getSize()) {
-    throw std::out_of_range("insert: start out of range");
-  }
-  size_t new_capacity = getSize() + end - start;
-  size_t new_size = new_capacity;
-  T * new_data = new T[new_capacity];
-  try {
-    for (size_t i = 0; i < id; ++i) {
-      new_data[i] = data_[i];
-    }
-    for (size_t i = 0; i < end - start; ++i) {
-      new_data[i + id] = v.data_[start + i];
-    }
-    for (size_t i = id + end - start; i < new_size; ++i) {
-      new_data[i] = data_[i- (end - start)];
-    }
-  } catch (...) {
-    delete[] new_data;
-    throw;
-  }
-  delete[] data_;
-  data_ = new_data;
-  size_ = new_size;
-  capacity_ = new_capacity;
+  insert(begin() + id, v.begin() + start, v.begin() + end);
 }
 
 template< class T >
@@ -364,34 +386,28 @@ void zharov::Vector< T >::erase(size_t id)
 }
 
 template< class T >
-void zharov::Vector< T >::erase(size_t start, size_t end)
+void zharov::Vector< T >::erase(VIter< T > start , VIter< T > finish)
 {
-  if (start > end) {
-    throw std::logic_error("insert: start > end");
+  if (start > finish) {
+    throw std::logic_error("erase: start > end");
   }
-  if (end > getSize()) {
-    throw std::out_of_range("insert: end out of range");
+  if (finish > end()) {
+    throw std::out_of_range("erase: end out of range");
   }
-  if (start >= getSize()) {
-    throw std::out_of_range("insert: start out of range");
+  if (start > end()) {
+    throw std::out_of_range("erase: start out of range");
   }
-
-  T * new_data = new T[getSize() - (end - start)];
-  try {
-    for (size_t i = 0; i < start; ++i) {
-      new_data[i] = data_[i];
-    }
-    for (size_t i = start; i < getSize() - (end - start); ++i) {
-      new_data[i] = data_[i + (end - start)];
-    }
-  } catch (...) {
-    delete[] new_data;
-    throw;
+  std::ptrdiff_t len = finish - start;
+  Vector< T > cpy(size_ - len);
+  VIter< T > itcp = cpy.begin();
+  for (auto it = begin(); it < start; ++itcp, ++it) {
+    *cpy = *it;
   }
-  delete[] data_;
-  data_ = new_data;
-  size_ -= (end - start);
-  capacity_ = size_;
+  for (auto it = finish; it < end(), ++itcp, ++it) {
+    *cpy = *it;
+  }
+  
+  swap(cpy);
 }
 
 #endif

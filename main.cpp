@@ -1,34 +1,34 @@
 #include <iostream>
-#include "top-it-vector.hpp"
+#include "vector.hpp"
 
 bool testEmptyVector()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   return v.isEmpty();
 }
 
 bool testGetSize()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   return v.getSize() == 0;
 }
 
 bool testGetCapacity()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   return v.getCapacity() == 0;
 }
 
 bool testPushBack()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   v.pushBack(1);
   return v[0] == 1 && v.getSize() == 1 && v.getCapacity() == 2;
 }
 
 bool testPopBack()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   v.pushBack(1);
   v.popBack();
   return v.getSize() == 0 && v.getCapacity() == 2;
@@ -36,7 +36,7 @@ bool testPopBack()
 
 bool testElementInBoundAccess()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   v.pushBack(1);
   try {
     int & val = v.at(0);
@@ -48,7 +48,7 @@ bool testElementInBoundAccess()
 
 bool testElementOutOfBoundAccess()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   try {
     v.at(0);
     return false;
@@ -61,9 +61,9 @@ bool testElementOutOfBoundAccess()
 
 bool testElementInBoundConstAccess()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   v.pushBack(1);
-  const topit::Vector< int > & cv = v;
+  const zharov::Vector< int > & cv = v;
   try {
     const int & val = cv.at(0);
     return val == 1;
@@ -74,7 +74,7 @@ bool testElementInBoundConstAccess()
 
 bool testElementOutOfBoundConstAccess()
 {
-  const topit::Vector< int > v;
+  const zharov::Vector< int > v;
   try {
     v.at(0);
     return false;
@@ -87,55 +87,55 @@ bool testElementOutOfBoundConstAccess()
 
 bool testCopyConstractor()
 {
-  topit::Vector< int > v;
-  topit::Vector< int > cv = v;
+  zharov::Vector< int > v;
+  zharov::Vector< int > cv = v;
   return v == cv;
 }
 
 bool testCopyNoneEmptyVector()
 {
-  topit::Vector< int > v;
+  zharov::Vector< int > v;
   v.pushBack(1);
-  topit::Vector< int > cv = v;
+  zharov::Vector< int > cv = v;
   return v == cv;
 }
 
 bool testMoveConstractor()
 {
-  topit::Vector< int > v(2, 1);
-  topit::Vector< int > cv = std::move(v);
+  zharov::Vector< int > v(2, 1);
+  zharov::Vector< int > cv = std::move(v);
   return cv.getSize() == 2;
 }
 
 bool testCopyOperator()
 {
-  topit::Vector< int > v(2, 1);
-  topit::Vector< int > v2(3, 2);
+  zharov::Vector< int > v(2, 1);
+  zharov::Vector< int > v2(3, 2);
   v = v2;
   return v.getSize() == 3 && v.at(0) == 2;
 }
 
 bool testMoveOperator()
 {
-  topit::Vector< int > v(2, 1);
-  topit::Vector< int > v2(3, 2);
+  zharov::Vector< int > v(2, 1);
+  zharov::Vector< int > v2(3, 2);
   v = std::move(v2);
   return v.getSize() == 3 && v.at(0) == 2;
 }
 
 bool testInsertValue()
 {
-  topit::Vector< int > v(2, 1);
+  zharov::Vector< int > v(2, 1);
   v.insert(1, 0);
   return v.getSize() == 3 && v.at(1) == 0 && v.at(2) == 1;
 }
 
 bool testInsertVector()
 {
-  topit::Vector< int > v(2, 1);
-  topit::Vector< int > vi(3, 0);
+  zharov::Vector< int > v(2, 1);
+  zharov::Vector< int > vi(3, 0);
   v.insert(1, vi, 0, 2);
-  topit::Vector< int > vr;
+  zharov::Vector< int > vr;
   vr.pushBack(1);
   vr.pushBack(0);
   vr.pushBack(0);
@@ -145,31 +145,65 @@ bool testInsertVector()
 
 bool testInsertSelfVector()
 {
-  topit::Vector< int > v(2, 1);
+  zharov::Vector< int > v(2, 1);
   v.insert(1, v, 0, 2);
-  topit::Vector< int > vr;
+  zharov::Vector< int > vr;
+  for (size_t i = 0; i < 4; ++i) {
+    vr.pushBack(1);
+  }
+  return v == vr;
+}
+
+bool testIterInsertValue()
+{
+  zharov::Vector< int > v(2, 1);
+  auto it = v.begin();
+  v.insert(it + 1, 0);
+  return v.getSize() == 3 && v.at(1) == 0 && v.at(2) == 1;
+}
+
+bool testIterInsertVector()
+{
+  zharov::Vector< int > v(2, 1);
+  zharov::Vector< int > vi(3, 0);
+  auto it = v.begin();
+  auto it2 = vi.cbegin();
+  v.insert(it + 1, it2, it2 + 2);
+  zharov::Vector< int > vr;
   vr.pushBack(1);
+  vr.pushBack(0);
+  vr.pushBack(0);
   vr.pushBack(1);
-  vr.pushBack(1);
-  vr.pushBack(1);
+  return v == vr;
+}
+
+bool testIterInsertSelfVector()
+{
+  zharov::Vector< int > v(2, 1);
+  auto it = v.begin();
+  v.insert(it + 1, v.cbegin(), v.cbegin() + 2);
+  zharov::Vector< int > vr;
+  for (size_t i = 0; i < 4; ++i) {
+    vr.pushBack(1);
+  }
   return v == vr;
 }
 
 bool testEraseValue()
 {
-  topit::Vector< int > v(3, 0); 
+  zharov::Vector< int > v(3, 0); 
   v.erase(1);
   return v.getSize() == 2 && v.at(1) == 0;
 }
 
 bool testEraseRange()
 {
-  topit::Vector< int > v(3, 0);
+  zharov::Vector< int > v(3, 0);
   v.pushBack(1);
   v.pushBack(2);
   v.pushBack(3);  
   v.erase(1, 4);
-  topit::Vector< int > vr;
+  zharov::Vector< int > vr;
   vr.pushBack(0);
   vr.pushBack(2);
   vr.pushBack(3);
@@ -178,7 +212,7 @@ bool testEraseRange()
 
 bool testInitializerList()
 {
-  topit::Vector< int > v{1, 2, 3};
+  zharov::Vector< int > v{1, 2, 3};
   return v.getSize() == 3 && (v[0] == 1) && (v[1] == 2) && (v[2] == 3);
 }
 
@@ -205,7 +239,10 @@ int main()
     {"Erase Value", testEraseValue},
     {"Erase Range", testEraseRange},
     {"Insert Self Vector", testInsertSelfVector},
-    {"Non-empty vector for non-empty initializer list", testInitializerList}
+    {"Non-empty vector for non-empty initializer list", testInitializerList},
+    {"Iter Insert Value", testIterInsertValue},
+    {"Iter Insert Vector", testIterInsertVector},
+    {"Iter Insert Self Vector", testIterInsertSelfVector}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
