@@ -176,6 +176,12 @@ bool testEraseRange()
   return v.getSize() == 3 && v == vr;
 }
 
+bool testInitializerList()
+{
+  topit::Vector< int > v{1, 2, 3};
+  return v.getSize() == 3 && (v[0] == 1) && (v[1] == 2) && (v[2] == 3);
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -198,7 +204,8 @@ int main()
     {"Insert Vector", testInsertVector},
     {"Erase Value", testEraseValue},
     {"Erase Range", testEraseRange},
-    {"Insert Self Vector", testInsertSelfVector}
+    {"Insert Self Vector", testInsertSelfVector},
+    {"Non-empty vector for non-empty initializer list", testInitializerList}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;

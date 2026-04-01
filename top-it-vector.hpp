@@ -1,14 +1,16 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 #include <cstddef>
+#include <initializer_list>
 
-namespace topit {
+namespace zharov {
   template <class T >
   struct Vector {
     ~Vector();
     Vector();
     Vector(const Vector &);
     Vector(Vector &&);
+    explicit Vector(std::initializer_list< T > il);
     Vector & operator=(const Vector &);
     Vector & operator=(Vector &&);
     Vector(size_t size, const T & init);
@@ -22,9 +24,14 @@ namespace topit {
     bool isEmpty() const noexcept;
     size_t getSize() const noexcept;
     size_t getCapacity() const noexcept;
+    void reserve(size_t);
+    void shrinkToFit();
 
     void extend(size_t new_capacity);
     void pushBack(const T & v);
+    void pushBackCount(size_t k, const T & v);
+    template <class IT>
+    void pushBackRange(IT b, size_t c);
     void popBack();
     void insert(size_t id, const T & v);
     void insert(size_t id, const Vector< T > & v, size_t start, size_t end);
@@ -32,6 +39,7 @@ namespace topit {
     void erase(size_t start, size_t end);
 
   private:
+    void unsafePushBack();
     explicit Vector(size_t c);
     T * data_;
     size_t size_, capacity_;
@@ -42,33 +50,43 @@ namespace topit {
 }
 
 template< class T >
-topit::Vector< T >::~Vector()
+zharov::Vector< T >::~Vector()
 {
   delete[] data_;
 }
 
 template< class T >
-topit::Vector< T >::Vector():
+zharov::Vector< T >::Vector():
   data_(nullptr),
   size_(0),
   capacity_(0)
 {}
 
 template< class T >
-const T & topit::Vector< T >::operator[](size_t id) const noexcept
+zharov::Vector< T >::Vector(std::initializer_list< T > il):
+  Vector(il.size())
+{
+  size_t i = 0;
+  for (auto it = il.begin(); it != il.end(); ++it) {
+    data_[i++] = *it;
+  }
+}
+
+template< class T >
+const T & zharov::Vector< T >::operator[](size_t id) const noexcept
 {
   return data_[id];
 }
 
 template< class T >
-T & topit::Vector< T >::operator[](size_t id) noexcept
+T & zharov::Vector< T >::operator[](size_t id) noexcept
 {
   const Vector * cthis = this;
   return const_cast< T & >((*cthis)[id]);
 }
 
 template< class T >
-const T & topit::Vector< T >::at(size_t id) const
+const T & zharov::Vector< T >::at(size_t id) const
 {
   if (id < getSize()) {
     return (*this)[id];
@@ -77,32 +95,32 @@ const T & topit::Vector< T >::at(size_t id) const
 }
 
 template< class T >
-T & topit::Vector< T >::at(size_t id)
+T & zharov::Vector< T >::at(size_t id)
 {
   const Vector< T > * cthis = this ;
   return  const_cast< T & >(cthis->at(id));
 }
 
 template< class T >
-bool topit::Vector<T>::isEmpty() const noexcept
+bool zharov::Vector<T>::isEmpty() const noexcept
 {
   return !size_;
 }
 
 template< class T >
-size_t topit::Vector< T >::getSize() const noexcept
+size_t zharov::Vector< T >::getSize() const noexcept
 {
   return size_;
 }
 
 template< class T >
-size_t topit::Vector< T >::getCapacity() const noexcept
+size_t zharov::Vector< T >::getCapacity() const noexcept
 {
   return capacity_;
 }
 
 template< class T >
-void topit::Vector< T >::extend(size_t new_capacity)
+void zharov::Vector< T >::extend(size_t new_capacity)
 {
   T * new_data = new T[new_capacity];
   for (size_t i = 0; i < size_; ++i) {
@@ -114,7 +132,7 @@ void topit::Vector< T >::extend(size_t new_capacity)
 }
 
 template< class T >
-void topit::Vector< T >::pushBack(const T & v)
+void zharov::Vector< T >::pushBack(const T & v)
 {
   if (isEmpty()) {
     extend(2);
@@ -125,14 +143,35 @@ void topit::Vector< T >::pushBack(const T & v)
   data_[size_] = v;
   ++size_;
 }
+
 template< class T >
-void topit::Vector< T >::popBack()
+template< class IT >
+void zharov::Vector< T >::pushBackRange(IT b, size_t c)
+{
+  size_t c = std::distance(b, e);
+
+}
+
+template< class T >
+void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
+{
+
+}
+
+template< class T >
+void zharov::Vector< T >::unsafePushBack()
+{
+  assert(size_ < capacity_);
+}
+
+template< class T >
+void zharov::Vector< T >::popBack()
 {
   --size_;
 }
 
 template< class T >
-topit::Vector<T>::Vector(const Vector & other):
+zharov::Vector<T>::Vector(const Vector & other):
   Vector(other.size_)
 {
   for (size_t i = 0; i < other.size_; ++i) {
@@ -141,14 +180,14 @@ topit::Vector<T>::Vector(const Vector & other):
 }
 
 template< class T >
-topit::Vector< T >::Vector(size_t c):
+zharov::Vector< T >::Vector(size_t c):
   data_(c ? new T[c] : nullptr),
   size_(c),
   capacity_(c)
 {}
 
 template< class T >
-topit::Vector<T>::Vector(size_t size, const T & init):
+zharov::Vector<T>::Vector(size_t size, const T & init):
  Vector(size)
 {
   for (size_t i = 0; i < size; ++i) {
@@ -157,7 +196,7 @@ topit::Vector<T>::Vector(size_t size, const T & init):
 }
 
 template< class T >
-bool topit::operator==(const Vector<T> & lhs, const Vector<T> & rhs)
+bool zharov::operator==(const Vector<T> & lhs, const Vector<T> & rhs)
 {
   bool res = lhs.getSize() == rhs.getSize();
   for (size_t i = 0; i < lhs.getSize(); ++i) {
@@ -167,7 +206,7 @@ bool topit::operator==(const Vector<T> & lhs, const Vector<T> & rhs)
 }
 
 template< class T >
-void topit::Vector< T >::swap(Vector< T > & rhs) noexcept
+void zharov::Vector< T >::swap(Vector< T > & rhs) noexcept
 {
   std::swap(data_, rhs.data_);
   std::swap(size_, rhs.size_);
@@ -175,7 +214,7 @@ void topit::Vector< T >::swap(Vector< T > & rhs) noexcept
 }
 
 template< class T >
-topit::Vector<T> & topit::Vector<T>::operator=(const Vector & rhs)
+zharov::Vector<T> & zharov::Vector<T>::operator=(const Vector & rhs)
 {
   Vector< T > cpy(rhs);
   swap(cpy);
@@ -183,7 +222,7 @@ topit::Vector<T> & topit::Vector<T>::operator=(const Vector & rhs)
 }
 
 template< class T >
-topit::Vector< T >::Vector(Vector && o):
+zharov::Vector< T >::Vector(Vector && o):
   data_(o.data_),
   size_(o.size_),
   capacity_(o.capacity_)
@@ -192,7 +231,7 @@ topit::Vector< T >::Vector(Vector && o):
 }
 
 template< class T >
-topit::Vector< T > & topit::Vector< T >::operator=(Vector && o)
+zharov::Vector< T > & zharov::Vector< T >::operator=(Vector && o)
 {
   Vector< T > cpy(std::move(o));
   swap(cpy);
@@ -200,7 +239,7 @@ topit::Vector< T > & topit::Vector< T >::operator=(Vector && o)
 }
 
 template < class T >
-void topit::Vector< T >::insert(size_t id, const T & v)
+void zharov::Vector< T >::insert(size_t id, const T & v)
 {
   size_t new_capacity = getSize() + 1;
   size_t new_size = new_capacity;
@@ -224,7 +263,7 @@ void topit::Vector< T >::insert(size_t id, const T & v)
 }
 
 template< class T >
-void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, size_t end)
+void zharov::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, size_t end)
 {
   if (start > end) {
     throw std::logic_error("insert: start > end");
@@ -259,7 +298,7 @@ void topit::Vector< T >::insert(size_t id, const Vector< T > & v, size_t start, 
 }
 
 template< class T >
-void topit::Vector< T >::erase(size_t id)
+void zharov::Vector< T >::erase(size_t id)
 {
   T * new_data = new T[getSize() - 1];
   try {
@@ -280,7 +319,7 @@ void topit::Vector< T >::erase(size_t id)
 }
 
 template< class T >
-void topit::Vector< T >::erase(size_t start, size_t end)
+void zharov::Vector< T >::erase(size_t start, size_t end)
 {
   if (start > end) {
     throw std::logic_error("insert: start > end");
