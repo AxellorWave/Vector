@@ -191,7 +191,7 @@ bool testIterInsertSelfVector()
 
 bool testEraseValue()
 {
-  zharov::Vector< int > v(3, 0); 
+  zharov::Vector< int > v(3, 0);
   v.erase(1);
   return v.getSize() == 2 && v.at(1) == 0;
 }
@@ -201,8 +201,29 @@ bool testEraseRange()
   zharov::Vector< int > v(3, 0);
   v.pushBack(1);
   v.pushBack(2);
-  v.pushBack(3);  
+  v.pushBack(3);
   v.erase(1, 4);
+  zharov::Vector< int > vr;
+  vr.pushBack(0);
+  vr.pushBack(2);
+  vr.pushBack(3);
+  return v.getSize() == 3 && v == vr;
+}
+
+bool testIterEraseValue()
+{
+  zharov::Vector< int > v(3, 0);
+  v.erase(v.begin() + 1);
+  return v.getSize() == 2 && v.at(1) == 0;
+}
+
+bool testIterEraseRange()
+{
+  zharov::Vector< int > v(3, 0);
+  v.pushBack(1);
+  v.pushBack(2);
+  v.pushBack(3);
+  v.erase(v.begin() + 1, v.begin() + 4);
   zharov::Vector< int > vr;
   vr.pushBack(0);
   vr.pushBack(2);
@@ -238,6 +259,8 @@ int main()
     {"Insert Vector", testInsertVector},
     {"Erase Value", testEraseValue},
     {"Erase Range", testEraseRange},
+    {"Iter Erase Value", testIterEraseValue},
+    {"Iter Erase Range", testIterEraseRange},
     {"Insert Self Vector", testInsertSelfVector},
     {"Non-empty vector for non-empty initializer list", testInitializerList},
     {"Iter Insert Value", testIterInsertValue},
