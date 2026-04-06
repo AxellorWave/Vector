@@ -237,6 +237,118 @@ bool testInitializerList()
   return v.getSize() == 3 && (v[0] == 1) && (v[1] == 2) && (v[2] == 3);
 }
 
+bool testSwap()
+{
+  zharov::Vector< int > v1{1, 2, 3};
+  zharov::Vector< int > v2{4, 3, 2, 1};
+  v1.swap(v2);
+  return v1.getSize() == 4 && v2.getSize() == 3 &&
+  v1.at(0) == 4 && v2.at(0) == 1;
+}
+
+bool testReserve()
+{
+  zharov::Vector< int > v;
+  v.reserve(5);
+  return v.getSize() == 0 && v.getCapacity() == 5;
+}
+
+bool testShrinkToFit()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  bool res = v.getCapacity() == 3 && v.getSize() == 3;
+  v.reserve(5);
+  res = res && v.getCapacity() == 5;
+  v.shrinkToFit();
+  res = v.getCapacity() == 3 && v.getSize() == 3;
+  return res;
+}
+
+bool testBegin()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  auto it = v.begin();
+  ++it;
+  return *it == 2;
+}
+
+bool testBeginForConstVector()
+{
+  const zharov::Vector< int > v {1, 2, 3};
+  zharov::VCIter< int > it = v.begin();
+  ++it;
+  return *it == 2;
+}
+
+bool testConstBegin()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  zharov::VCIter< int > it = v.cbegin();
+  ++it;
+  return *it == 2;
+}
+
+bool testEnd()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  zharov::VIter< int > it = v.end();
+  --it;
+  return *it == 3;
+}
+
+bool testEndForConstVector()
+{
+  const zharov::Vector< int > v {1, 2, 3};
+  zharov::VCIter< int > it = v.end();
+  --it;
+  return *it == 3;
+}
+
+bool testConstEnd()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  zharov::VCIter< int > it = v.cend();
+  --it;
+  return *it == 3;
+}
+
+bool testPushBackCount()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  v.pushBackCount(3, 5);
+  return v == zharov::Vector< int > {1, 2, 3, 5, 5, 5};
+}
+
+bool testPushBackRange()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  zharov::Vector< int > v2 {0, 0, 0};
+  v.pushBackRange(v2.begin(), 3);
+  return v == zharov::Vector< int > {1, 2, 3, 0, 0, 0};
+}
+
+bool testMoveInsert()
+{
+  zharov::Vector< int > v {1, 2, 3};
+  int val = 7;
+  v.insert(v.begin() + 1, std::move(val));
+  return v == zharov::Vector< int > {1, 7, 2, 3};
+}
+
+bool isEven(const int & v)
+{
+  return v % 2 == 0;
+}
+
+bool testEraseWithCmp()
+{
+  zharov::Vector< int > v {1, 2, 3, 4, 5, 6};
+  for (size_t i = 0; i < v.getSize(); ++i) {
+    v.erase(v.begin() + i, isEven);
+  }
+  return v == zharov::Vector< int > {1, 3, 5};
+}
+
 int main()
 {
   using test_t = std::pair< const char *, bool(*)() >;
@@ -265,7 +377,20 @@ int main()
     {"Non-empty vector for non-empty initializer list", testInitializerList},
     {"Iter Insert Value", testIterInsertValue},
     {"Iter Insert Vector", testIterInsertVector},
-    {"Iter Insert Self Vector", testIterInsertSelfVector}
+    {"Iter Insert Self Vector", testIterInsertSelfVector},
+    {"Swap", testSwap},
+    {"Reserve", testReserve},
+    {"Shrink To Fit", testShrinkToFit},
+    {"Iterator to begin", testBegin},
+    {"Iteraror to begin for const vector", testBeginForConstVector},
+    {"Const iterator to begin", testConstBegin},
+    {"Iterator to end", testEnd},
+    {"Iteraror to end for const vector", testEndForConstVector},
+    {"Const iterator to end", testConstEnd},
+    {"Push Back Count", testPushBackCount},
+    {"Push Back Range", testPushBackRange},
+    {"Move Insert", testMoveInsert},
+    {"Erase with comparator", testEraseWithCmp}
   };
   const size_t count = sizeof(tests) / sizeof(test_t);
   std::cout << std::boolalpha;
