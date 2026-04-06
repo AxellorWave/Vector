@@ -10,7 +10,6 @@ namespace zharov {
     T & operator*() const;
     T * operator->() const;
     T & operator[](std::ptrdiff_t n) const;
-    
     VIter< T > & operator++();
     VIter< T > operator++(int);
     VIter< T > & operator--();

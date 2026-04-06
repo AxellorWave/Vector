@@ -37,14 +37,11 @@ namespace zharov {
     VCIter< T > end() const;
     VCIter< T > cend() const;
 
-    void extend(size_t new_capacity);
     void pushBack(const T & v);
     void pushBackCount(size_t k, const T & v);
     template <class IT>
     void pushBackRange(IT b, size_t c);
     void popBack();
-    template< class U >
-    VIter< T > generalInsert(VIter< T > pos, U && v);
     void insert(size_t id, const T & v);
     void insert(size_t id, const Vector< T > & v, size_t start, size_t end);
     VIter< T > insert(VIter< T > pos, const T & v);
@@ -55,8 +52,9 @@ namespace zharov {
     void erase(VIter< T > start , VIter< T > finish);
     void erase(VIter< T > pos);
 
-
   private:
+    template< class U >
+    VIter< T > generalInsert(VIter< T > pos, U && v);
     void unsafePushBack();
     explicit Vector(size_t c);
     T * data_;
@@ -70,7 +68,10 @@ namespace zharov {
 template< class T >
 zharov::Vector< T >::~Vector()
 {
-  delete[] data_;
+  for (size_t j = 0; j < size_; ++j) {
+    data_[j].~T();
+  }
+  ::operator delete (data_);
 }
 
 template< class T >
@@ -85,9 +86,10 @@ zharov::Vector< T >::Vector(std::initializer_list< T > il):
   Vector(il.size())
 {
   size_t i = 0;
-  for (auto it = il.begin(); it != il.end(); ++it) {
-    data_[i++] = *it;
+  for (auto it = il.begin(); it != il.end(); ++it, ++i) {
+    new (data_ + i) T(*it);
   }
+  size_ = il.size();
 }
 
 template< class T >
@@ -174,25 +176,43 @@ size_t zharov::Vector< T >::getCapacity() const noexcept
 }
 
 template< class T >
-void zharov::Vector< T >::extend(size_t new_capacity)
+void zharov::Vector< T >::reserve(size_t new_capacity)
 {
-  T * new_data = new T[new_capacity];
-  for (size_t i = 0; i < size_; ++i) {
-    new_data[i] = data_[i];
+  T * new_data = static_cast< T* >(::operator new (sizeof(T) * new_capacity));
+  size_t i = 0;
+  try {
+    for (; i < size_; ++i) {
+      new (new_data + i) T(data_[i]);
+    }
+  } catch (...) {
+    for (size_t j = 0; j < i; ++j) {
+      new_data[j].~T();
+    }
+    ::operator delete (new_data);
   }
-  delete[] data_;
+
+  for (size_t j = 0; j < size_; ++j) {
+    data_[j].~T();
+  }
+  ::operator delete (data_);
   data_ = new_data;
   capacity_ = new_capacity;
+}
+
+template< class T >
+void zharov::Vector< T >::shrinkToFit()
+{
+  reserve(size_);
 }
 
 template< class T >
 void zharov::Vector< T >::pushBack(const T & v)
 {
   if (isEmpty()) {
-    extend(2);
+    reserve(2);
   }
   if (size_ == capacity_) {
-    extend(capacity_ * 2);
+    reserve(capacity_ * 2);
   }
   data_[size_] = v;
   ++size_;
@@ -203,14 +223,13 @@ void zharov::Vector< T >::pushBack(const T & v)
 // void zharov::Vector< T >::pushBackRange(IT b, size_t c)
 // {
 //   size_t c = std::distance(b, e);
-
-//}
+// }
 
 // template< class T >
 // void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
 // {
 
-//}
+// }
 
 // template< class T >
 // void zharov::Vector< T >::unsafePushBack()
@@ -228,15 +247,17 @@ template< class T >
 zharov::Vector<T>::Vector(const Vector & other):
   Vector(other.size_)
 {
-  for (size_t i = 0; i < other.size_; ++i) {
-    data_[i] = other.data_[i];
+  size_t i = 0;
+  for (; i < other.size_; ++i) {
+    new (data_ + i) T(other.data_[i]);
   }
+  size_ = other.size_;
 }
 
 template< class T >
 zharov::Vector< T >::Vector(size_t c):
-  data_(c ? new T[c] : nullptr),
-  size_(c),
+  data_(c ? static_cast< T* >(::operator new (sizeof(T) * c)) : nullptr),
+  size_(0),
   capacity_(c)
 {}
 
@@ -244,9 +265,11 @@ template< class T >
 zharov::Vector<T>::Vector(size_t size, const T & init):
  Vector(size)
 {
-  for (size_t i = 0; i < size; ++i) {
-    data_[i] = init;
+  size_t i = 0;
+  for (; i < size; ++i) {
+    new (data_ + i) T(init);
   }
+  size_ = size;
 }
 
 template< class T >
@@ -313,7 +336,7 @@ zharov::VIter< T > zharov::Vector< T >::generalInsert(VIter< T > pos, U && v)
   }
   swap(cpy);
   return VIter< T >(data_ + ind);
-} 
+}
 
 template < class T >
 void zharov::Vector< T >::insert(size_t id, const T & v)
@@ -344,7 +367,6 @@ zharov::VIter< T > zharov::Vector< T >::insert(VIter< T > pos, VCIter< T > start
     *cpit = *it;
   }
   swap(cpy);
-  
   return VIter< T >(data_ + ind);
 }
 
@@ -408,7 +430,6 @@ void zharov::Vector< T >::erase(VIter< T > start , VIter< T > finish)
   for (auto it = finish; it < end(); ++itcp, ++it) {
     *itcp = *it;
   }
-  
   swap(cpy);
 }
 
