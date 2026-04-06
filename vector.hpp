@@ -1,6 +1,7 @@
 #ifndef TOP_IT_VECTOR_HPP
 #define TOP_IT_VECTOR_HPP
 #include <utility>
+#include <cassert>
 #include <cstddef>
 #include <initializer_list>
 #include "viter.hpp"
@@ -55,7 +56,7 @@ namespace zharov {
   private:
     template< class U >
     VIter< T > generalInsert(VIter< T > pos, U && v);
-    void unsafePushBack();
+    void unsafePushBack(const T & v);
     explicit Vector(size_t c);
     T * data_;
     size_t size_, capacity_;
@@ -214,15 +215,14 @@ void zharov::Vector< T >::pushBack(const T & v)
   if (size_ == capacity_) {
     reserve(capacity_ * 2);
   }
-  data_[size_] = v;
-  ++size_;
+  unsafePushBack(v);
 }
 
 // template< class T >
 // template< class IT >
 // void zharov::Vector< T >::pushBackRange(IT b, size_t c)
 // {
-//   size_t c = std::distance(b, e);
+  
 // }
 
 // template< class T >
@@ -231,15 +231,18 @@ void zharov::Vector< T >::pushBack(const T & v)
 
 // }
 
-// template< class T >
-// void zharov::Vector< T >::unsafePushBack()
-// {
-//   assert(size_ < capacity_);
-// }
+template< class T >
+void zharov::Vector< T >::unsafePushBack(const T & v)
+{
+  assert(size_ < capacity_);
+  new (data_ + size_) T(v);
+  ++size_;
+}
 
 template< class T >
 void zharov::Vector< T >::popBack()
 {
+  data_[size_ - 1].~T();
   --size_;
 }
 
@@ -325,14 +328,12 @@ zharov::VIter< T > zharov::Vector< T >::generalInsert(VIter< T > pos, U && v)
   }
   std::ptrdiff_t ind = pos - begin();
   Vector< T > cpy(size_ + 1);
-  VIter< T > cpit = cpy.begin();
-  for (VIter< T > it = begin(); it < pos; ++it, ++cpit) {
-    *cpit = *it;
+  for (VIter< T > it = begin(); it < pos; ++it) {
+    cpy.unsafePushBack(*it);
   }
-  *cpit = std::forward< U >(v);
-  ++cpit;
-  for (VIter< T > it = pos; it < end(); ++it, ++cpit) {
-    *cpit = *it;
+  cpy.unsafePushBack(std::forward< U >(v));
+  for (VIter< T > it = pos; it < end(); ++it) {
+    cpy.unsafePushBack(*it);
   }
   swap(cpy);
   return VIter< T >(data_ + ind);
@@ -356,15 +357,14 @@ zharov::VIter< T > zharov::Vector< T >::insert(VIter< T > pos, VCIter< T > start
   std::ptrdiff_t ind = pos - begin();
   std::ptrdiff_t len = finish - start;
   Vector< T > cpy(size_ + len);
-  VIter< T > cpit = cpy.begin();
-  for (VIter< T > it = begin(); it < pos; ++it, ++cpit) {
-    *cpit = *it;
+  for (VIter< T > it = begin(); it < pos; ++it) {
+    cpy.unsafePushBack(*it);
   }
-  for (;start < finish; ++start, ++cpit) {
-    *cpit = *start;
+  for (;start < finish; ++start) {
+    cpy.unsafePushBack(*start);
   }
-  for (VIter< T > it = pos; it < end(); ++it, ++cpit) {
-    *cpit = *it;
+  for (VIter< T > it = pos; it < end(); ++it) {
+    cpy.unsafePushBack(*it);
   }
   swap(cpy);
   return VIter< T >(data_ + ind);
@@ -392,13 +392,11 @@ template< class T >
 void zharov::Vector< T >::erase(VIter< T > pos)
 {
   Vector< T > cpy(size_ - 1);
-  VIter< T > itcp = cpy.begin();
-
-  for (auto it = begin(); it < pos; ++it, ++itcp) {
-    *itcp = *it;
+  for (auto it = begin(); it < pos; ++it) {
+    cpy.unsafePushBack(*it);
   }
-  for (auto it = pos; it < end(); ++it, ++itcp) {
-    *itcp = *it;
+  for (auto it = pos + 1; it < end(); ++it) {
+    cpy.unsafePushBack(*it);
   }
   swap(cpy);
 }
@@ -423,12 +421,11 @@ void zharov::Vector< T >::erase(VIter< T > start , VIter< T > finish)
   }
   std::ptrdiff_t len = finish - start;
   Vector< T > cpy(size_ - len);
-  VIter< T > itcp = cpy.begin();
-  for (auto it = begin(); it < start; ++itcp, ++it) {
-    *itcp = *it;
+  for (auto it = begin(); it < start; ++it) {
+    cpy.unsafePushBack(*it);
   }
-  for (auto it = finish; it < end(); ++itcp, ++it) {
-    *itcp = *it;
+  for (auto it = finish; it < end(); ++it) {
+    cpy.unsafePushBack(*it);
   }
   swap(cpy);
 }
