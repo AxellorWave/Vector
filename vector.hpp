@@ -218,18 +218,29 @@ void zharov::Vector< T >::pushBack(const T & v)
   unsafePushBack(v);
 }
 
-// template< class T >
-// template< class IT >
-// void zharov::Vector< T >::pushBackRange(IT b, size_t c)
-// {
-  
-// }
+template< class T >
+template< class IT >
+void zharov::Vector< T >::pushBackRange(IT b, size_t c)
+{
+  if (size_ + c > capacity_) {
+    reserve(size_ + c);
+  }
+  for (size_t i = 0; i < c; ++i) {
+    unsafePushBack(*b);
+    ++b;
+  }
+}
 
-// template< class T >
-// void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
-// {
-
-// }
+template< class T >
+void zharov::Vector< T >::pushBackCount(size_t k, const T & v)
+{
+  if (size_ + k > capacity_) {
+    reserve(size_ + k);
+  }
+  for (size_t i = 0; i < k; ++i) {
+    unsafePushBack(v);
+  }
+}
 
 template< class T >
 void zharov::Vector< T >::unsafePushBack(const T & v)
